@@ -10,7 +10,6 @@ import com.application.modul3.exemplary.dto.ExemplaryDTO;
 
 @Component
 public class ExemplaryMapper {
-
 	public ExemplaryDTO exemplary2ExemplaryDTO(Exemplary exemplary) {
 		ExemplaryDTO exemplaryDTO = new ExemplaryDTO();
 		exemplaryDTO.setId(exemplary.getId());
@@ -32,5 +31,4 @@ public class ExemplaryMapper {
 		exemplary.setPageNumbers(exemplaryDTO.getPageNumbers());
 		return exemplary;
 	}
-
 }

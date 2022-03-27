@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -29,12 +30,12 @@ public class Appointment {
 	@Column(name = "date_until")
 	private LocalDate dateUntil;
 	
-	@ManyToOne()
-	@JoinColumn (name = "exemplar_id")
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "exemplary_id")
 	private Exemplary exemplary;
 	
-	@ManyToOne()
-	@JoinColumn (name = "user_id")
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_id")
 	private User user;
 
 	public Integer getId() {

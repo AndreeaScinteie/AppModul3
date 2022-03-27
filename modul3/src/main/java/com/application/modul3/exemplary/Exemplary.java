@@ -1,25 +1,27 @@
 package com.application.modul3.exemplary;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.PreRemove;
 import javax.persistence.Table;
 
 import com.application.modul3.appointment.Appointment;
 import com.application.modul3.book.Book;
 import com.application.modul3.publisher.Publisher;
 
-@Entity
+@Entity(name = "exemplary")
 @Table(name = "exemplary", schema = "administration")
 public class Exemplary {
 
@@ -34,22 +36,26 @@ public class Exemplary {
 	@Column(name = "code")
 	private String code;
 
+	
 	@Column(name = "page_numbers")
 	private Integer pageNumbers;
 
-	// entitatea copil
-	@ManyToOne()
-	@JoinColumn(name = "book_id")
-	// @JsonIgnoreProperties("exemplaries")
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "book_id", updatable = false)
 	private Book book;
-	
-	@ManyToOne
+
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "publisher_id")
 	private Publisher publisher;
-	
+
 	@OneToMany(mappedBy = "exemplary", cascade = { CascadeType.PERSIST, CascadeType.MERGE,
-			CascadeType.REMOVE }, orphanRemoval = true)
-	private Set<Appointment> appointments = new HashSet<>();
+			CascadeType.REMOVE }, fetch = FetchType.LAZY, orphanRemoval = true)
+	private List<Appointment> appointments = new ArrayList<>();
+
+	@PreRemove
+	public void delete() {
+		this.book.removeExemplary(this);
+	}
 
 	public Integer getId() {
 		return id;
@@ -75,20 +81,20 @@ public class Exemplary {
 		this.code = code;
 	}
 
-	public Integer getPageNumbers() {
-		return pageNumbers;
-	}
-
-	public void setPageNumbers(Integer pageNumbers) {
-		this.pageNumbers = pageNumbers;
-	}
-
 	public Book getBook() {
 		return book;
 	}
 
 	public void setBook(Book book) {
 		this.book = book;
+	}
+
+	public Integer getPageNumbers() {
+		return pageNumbers;
+	}
+
+	public void setPageNumbers(Integer pageNumbers) {
+		this.pageNumbers = pageNumbers;
 	}
 
 	public Publisher getPublisher() {
@@ -99,19 +105,34 @@ public class Exemplary {
 		this.publisher = publisher;
 	}
 
-	public Set<Appointment> getAppointments() {
-		return appointments;
-	}
-
-	public void setAppointments(Set<Appointment> appointments) {
-		this.appointments = appointments;
-	}
-
 	public void addAppointment(Appointment appointment) {
-		this.appointments.add(appointment);
-		appointment.setExemplary(this);	
+		appointments.add(appointment);
+		appointment.setExemplary(this);
 	}
-	
 
-	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Exemplary other = (Exemplary) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		return true;
+	}
+
 }
